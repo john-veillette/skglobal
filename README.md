@@ -6,7 +6,7 @@ Our estimators conform to the [scikit-learn](https://scikit-learn.org/stable/) e
 
 ## How to Use
 
-In brief, you can import the estimator, initialize it with `LinearClassifier(loss, **loss_args)`, and then use it just like any other (binary) linear classifier in the scikit-learn library. The available loss functions are currently `precision_recall_auc`, `'roc_auc'`, `'recall_at_precision'`, `'precision_at_recall'`, `'false_positive_rate_at_true_positive_rate'`, and `'true_positive_rate_at_false_positive_rate'`. Check `global_objectives/loss_layers.py` to see what `**loss_args` arguments your chosen loss function takes.
+In brief, you can import the estimator, initialize it with `LinearClassifier(loss, **loss_args)`, and then use it just like any other (binary) linear classifier in the scikit-learn library. The available loss functions are currently `'precision_recall_auc'`, `'roc_auc'`, `'recall_at_precision'`, `'precision_at_recall'`, `'false_positive_rate_at_true_positive_rate'`, and `'true_positive_rate_at_false_positive_rate'`. Check `global_objectives/loss_layers.py` to see what `**loss_args` arguments your chosen loss function takes.
 
 You can also specify a regularization `penalty` and weight `C`, `tol`, and `max_iter`, which work consistently with how they would in an sklearn classifier. If you want to use stochastic gradient descent for optimization, just specify `batch_size`.
 

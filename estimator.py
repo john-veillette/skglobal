@@ -2,6 +2,7 @@ from scikeras.wrappers import KerasClassifier
 from tensorflow.compat.v1.keras.regularizers import L1L2
 from tensorflow.compat.v1.keras.models import Sequential
 from tensorflow.compat.v1.keras.layers import Dense
+from tensorflow.compat.v1.keras import Input
 from tensorflow.compat.v1.keras.callbacks import EarlyStopping
 from tensorflow.compat.v1.keras.backend import reshape, get_session
 import tensorflow.compat.v1 as tf
@@ -60,15 +61,19 @@ class LinearClassifier(LinearModel):
             n_classes_ = meta["n_classes_"]
             # and build model
             mod = Sequential()
-            mod.add(Dense(
-                1, 
-                activation = 'softmax', # so we can use predict_proba method
-                kernel_regularizer = L1L2(l1 = c1, l2 = c2),
-                input_shape = X_shape_[1:],
-                name = 'proba'
-                ))
+            mod.add(Input(shape = X_shape_[1:]))
+            mod.add(
+                Dense(
+                    1, 
+                    activation = 'sigmoid', 
+                    kernel_regularizer = L1L2(l1 = c1, l2 = c2),
+                    name = 'proba'
+                    )
+                )
             mod.compile(
-                loss = get_loss(loss, **loss_args),
+                loss = get_loss(loss, **loss_args), 
+                optimizer = 'sgd',
+                metrics = ['accuracy']
                 )
             # keras will forget to compile some variables in
             # the custom tf loss functions, so we fix that here

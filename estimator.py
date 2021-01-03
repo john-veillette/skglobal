@@ -5,8 +5,10 @@ from tensorflow.compat.v1.keras.layers import Dense
 from tensorflow.compat.v1.keras import Input
 from tensorflow.compat.v1.keras.callbacks import EarlyStopping
 from tensorflow.compat.v1.keras.backend import reshape, get_session
+import tensorflow.python.util.deprecation as deprecation
 import tensorflow.compat.v1 as tf
 from mne.decoding.base import LinearModel
+from warnings import filterwarnings, catch_warnings
 import global_objectives as go
 import numpy as np
 
@@ -44,7 +46,11 @@ class LinearClassifier(LinearModel):
     '''
 
     def __init__(self, loss, penalty = 'l2', C = 1., tol = 1e-4, 
-        max_iter = 1000, batch_size = None, **loss_args):
+        max_iter = 1000, batch_size = None, warnings = False, **loss_args):
+
+        self.warnings_ = warnings
+        if not warnings:
+            deprecation._PRINT_DEPRECATION_WARNINGS = False
 
         if penalty is 'l1':
             c1 = C 
@@ -82,7 +88,12 @@ class LinearClassifier(LinearModel):
             sess.run(init_op)
             return mod 
 
-        model = KerasClassifier(build_model, epochs = max_iter)
+        if warnings:
+            model = KerasClassifier(build_model, epochs = max_iter)
+        else:
+            with catch_warnings():
+                filterwarnings("ignore")
+                model = KerasClassifier(build_model, epochs = max_iter)
         self.model = model 
         self._estimator_type = getattr(model, "_estimator_type", None)  
 
@@ -92,6 +103,14 @@ class LinearClassifier(LinearModel):
         self.max_iter = max_iter
 
     def fit(self, X, y, sample_weight = None):
+        if self.warnings_:
+            return self._fit(X, y, sample_weight = None)
+        else:
+            with catch_warnings():
+                filterwarnings("ignore")
+                return self._fit(X, y, sample_weight = None)
+
+    def _fit(self, X, y, sample_weight = None):
         if np.unique(y).shape[0] > 2:
             raise ValueError(
                 "Global loss functions currently only support binary "
@@ -105,6 +124,7 @@ class LinearClassifier(LinearModel):
         if sample_weight is not None:
             fit_params['sample_weight'] = sample_weight
         fit_params['callbacks'] = [self.stopping_criteria]
+        fit_params['verbose'] = 0
         return super().fit(X, y, **fit_params)
 
     @property

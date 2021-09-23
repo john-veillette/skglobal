@@ -14,6 +14,8 @@ The only argument the `fit` method can take other than `X` and `y` is `sample_we
 
 Some super minimal example code is in `example.ipynb`.
 
+__Note__: Since the loss functions are "global" and not dependant on a particular decision threshold, the classifier doesn't really optimize the intercept of the linear model. So you may have to enforce your own decision threshold at inference time, depending on your usage case.
+
 ## Loss Functions
 
 The loss functions used come from a [no-longer-supported Google research repo](https://github.com/tensorflow/models/tree/archive/research/global_objectives). Since their code is archived, we copied it into the `global_objectives` directory with an `__init__.py` file added for easier access while maintaining a clear deliniation between their work and mine. I also replaced some `tf.contrib` functionality and modified the import statements for Tensorflow 2 compatibility. If you use this repository, make sure to cite their gem of a [paper](https://arxiv.org/abs/1608.04802).
